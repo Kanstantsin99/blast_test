@@ -2,6 +2,7 @@ import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 import {Grid} from "../model/grid";
 import {BlockFactory} from "../model/block_factory";
 import Vec2 = cc.Vec2;
+import easing = cc.easing;
 
 
 const {ccclass, property} = cc._decorator;
@@ -15,6 +16,7 @@ export default class GridPresenter extends cc.Component {
     private grid: Grid;
     private blockFactory: BlockFactory;
     private cellSize: Vec2;
+    private cellSpeed: number = 9; // cells pre sec
 
     protected onLoad() {
         this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {
@@ -35,22 +37,49 @@ export default class GridPresenter extends cc.Component {
     private setCellSize()
     {
         let gridSize = this.grid.getGridSize();
-        this.cellSize.x = Math.floor(this.gridNode.width / gridSize.x) - 1; // BUG: Add a small offset to prevent row overload
+        this.cellSize.x = Math.floor(this.gridNode.width / gridSize.x);
         this.cellSize.y = Math.floor(this.gridNode.height / gridSize.y);
         console.log("cell width: ", this.cellSize.x);
         console.log("cell height: ", this.cellSize.y);
     }
 
-    private spawnBlocks() {
-        let cells = this.grid.getCells();
+    private spawnBlocks()
+    {
         let gridSize = this.grid.getGridSize();
+        const gridHeight   = gridSize.y;
+        const cellSpeed    = this.cellSpeed;       // cells per second
+        const totalCells   = gridHeight + 1;       // from spawn at row -1 down to row 0…gridHeight-1
+        const duration     = totalCells / cellSpeed;
 
         for (let i = 0; i < gridSize.x; i++) {
-            for (let j = 0; j < gridSize.y; j++) {
-                this.blockFactory.create(cells[i][j].getBlock(), this.gridNode, this.grid_to_pixel(i, j));
+            for (let j = gridHeight - 1; j >= 0; j--) {
+                const startPos = this.grid_to_pixel(i, -1);
+                const endPos   = this.grid_to_pixel(i, j);
+
+                // delay so top blocks wait less, bottom blocks wait more
+                // (gridHeight-1 - j) gives 0 for top row, up to gridHeight-1 for bottom
+                const delayTime = (gridHeight - 1 - j) / cellSpeed;
+
+                const node = this.blockFactory.create(
+                    this.grid.getCells()[i][j].getBlock(),
+                    this.gridNode,
+                    startPos
+                );
+
+                cc.tween(node)
+                    .delay(delayTime)                           // staggered start
+                    .set({ position: startPos })                // ensure spawn pos
+                    .to(
+                        duration,
+                        { position: endPos },
+                        { easing: t => t }                         // identity easing = true linear
+                    )
+                    .start();
             }
         }
+
     }
+
 
     private grid_to_pixel(column: number, row: number): Vec2
     {
