@@ -11,7 +11,9 @@ export enum GridState
     None = 0,
     Idle = 1,
     DestroyingMatches = 2,
-    Collapsing = 3
+    Collapsing = 3,
+    Win = 4,
+    Loose = 5
 }
 
 export class Grid implements IService
@@ -213,7 +215,8 @@ export class Grid implements IService
         to.setData(block);
     }
 
-    private getBlockFromPool() : Block {
+    private getBlockFromPool() : Block
+    {
         for (let i = 0; i < this.poolSize; i++) {
             if (!this.blocks[i].inUse) {
                 let block: Block = this.blocks[i];
@@ -226,7 +229,7 @@ export class Grid implements IService
         return new Block(1);
     }
 
-    private savePositions()
+    private savePositions(): void
     {
         for (let i = 0; i < this.gridSize.x; i++)
         {
@@ -235,5 +238,10 @@ export class Grid implements IService
                 this.cells[i][j].getBlock().position = new Vec2(i, j);
             }
         }
+    }
+
+    public restart(): void
+    {
+        cc.game.end();
     }
 }

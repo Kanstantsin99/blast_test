@@ -3,6 +3,7 @@ import Vec2 = cc.Vec2;
 import {ServiceLocator} from "../../utils/service_locator/service_locator";
 import {BlockFactory} from "../grid/model/block_factory";
 import { Postponer } from "../../utils/postponer/postpener";
+import {Player} from "../../player/model/player";
 
 
 const {ccclass, property} = cc._decorator;
@@ -23,13 +24,23 @@ export default class StartApplication extends cc.Component
     {
         this.bindBlockFactory();
         this.bindGrid();
+        this.bindPlayer();
 
+        this.launchGameLoop();
+    }
+
+
+    private launchGameLoop() {
         Postponer.sequence()
             .do(() => this.loadSlashScreen())
             .wait(() => new Promise(resolve => setTimeout(resolve, 1000)))
             .do(() => this.loadMain())
     }
 
+    private bindPlayer() {
+        const player = new Player(10, 0, 5000);
+        ServiceLocator.register(Player, player);
+    }
 
     private bindBlockFactory() {
         const blockFactory = new BlockFactory(this.gridSize);
