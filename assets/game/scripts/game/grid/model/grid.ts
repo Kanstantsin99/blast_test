@@ -1,41 +1,10 @@
 import Vec2 = cc.Vec2;
 import {IService} from "../../../utils/service_locator/i_service";
-import {Block} from "./block";
+import {Block, BlockState} from "./block";
 import {Postponer} from "../../../utils/postponer/postpener";
 import {Durations} from "../../../durations";
-
-export enum CellType {
-    None= 0,
-    Empty= 1,
-    Filled= 2
-}
-
-export class CellData {
-    private type: CellType;
-    private block: Block;
-    constructor(public position: Vec2) {
-        this.type = CellType.Empty;
-    }
-
-    public setData(block: Block) {
-        this.block = block;
-        this.type = CellType.Filled;
-    }
-
-    public getBlock(): Block {
-        return this.block;
-    }
-
-    public getType(): CellType
-    {
-        return this.type;
-    }
-
-    public setType(CellType: CellType) {
-        this.type = CellType;
-    }
-
-}
+import {ReactiveProperty} from "../../../utils/types/reactive_property";
+import {CellData, CellType} from "./cell_data";
 
 export enum GridState
 {
@@ -49,31 +18,43 @@ export class Grid implements IService
 {
     private gridSize: Vec2;
     private cells: CellData[][];
-    private blocks: Block;
+    private blocks: Block[];
     private width: number;
     private height: number;
-    private gridState: GridState;
-    private matches: CellData[];
+    private poolSize: number;
+
+    public gridState: ReactiveProperty<GridState>;
+    public matches: CellData[];
 
     public setData(gridSize: Vec2)
     {
         this.gridSize = gridSize;
         this.width = Math.floor(gridSize.x);
         this.height = Math.floor(gridSize.y);
-        this.cells = this.initArray();
-        this.gridState = GridState.Idle;
+        this.poolSize = 2 * this.width * this.height;
+        this.cells = this.initCellsArray();
+        this.blocks = this.initBlocksArray();
+        this.gridState = new ReactiveProperty(GridState.DestroyingMatches);
+        this.switchState()
     }
 
-    private initArray(): CellData[][] {
+    private initCellsArray(): CellData[][] {
         const array: CellData[][] = new Array<CellData[]>(this.width);
+
         for (let i = 0; i < this.width; i++) {
             array[i] = new Array<CellData>(this.height);
             for (let j = 0; j < this.height; j++) {
                 array[i][j] = new CellData(new Vec2(i, j));
-                const random_type: number = cc.math.randomRangeInt(1,5);
-                const block = new Block(random_type);
-                array[i][j].setData(block);
             }
+        }
+        return array;
+    }
+
+    private initBlocksArray(): Block[] {
+        const array: Block[] = new Array<Block>(this.poolSize);
+
+        for (let i = 0; i < this.poolSize; i++) {
+            array[i] = new Block(1);
         }
         return array;
     }
@@ -128,14 +109,16 @@ export class Grid implements IService
 
     private switchState()
     {
-        console.log("Current grid state: " + this.gridState);
-        switch(this.gridState)
+        console.log("Previous grid state: " + this.gridState.value);
+        let previousState = this.gridState.value;
+        switch(previousState)
         {
             case GridState.None:
                 break;
             case GridState.Idle:
                 Postponer.sequence()
                     .do(() => this.destroyMatches())
+                    .do(() => this.gridState.value = GridState.DestroyingMatches)
                     .wait(() =>
                         new Promise(resolve =>
                             setTimeout(resolve, Durations.Destroying * 1000)))
@@ -144,25 +127,27 @@ export class Grid implements IService
             case GridState.DestroyingMatches:
                 Postponer.sequence()
                     .do(() => this.collapse())
+                    .do(() => this.gridState.value = GridState.Collapsing)
                     .wait(() =>
                         new Promise(resolve =>
-                            setTimeout(resolve, Durations.Collapsing * 1000)))
+                            setTimeout(resolve, Durations.Collapsing * 3000)))
                     .do(() => this.switchState());
                 break;
             case GridState.Collapsing:
-                this.gridState = GridState.Idle;
+                Postponer.sequence()
+                    .do(() => this.savePositions())
+                    .do(() => this.gridState.value = GridState.Idle)
                 break;
         }
     }
 
     public match_at(cellPos: Vec2): void
     {
-        if (this.gridState != GridState.Idle)
+        if (this.gridState.value != GridState.Idle)
         {
             return;
         }
 
-        const clickedCell: CellData = this.cells[cellPos.x][cellPos.y];
         const matches = this.getAdjacentMatches(cellPos);
         if (matches.length > 2)
         {
@@ -173,28 +158,78 @@ export class Grid implements IService
 
     private destroyMatches(): void
     {
-        this.gridState = GridState.DestroyingMatches;
-
         for (const cellData of this.matches)
         {
-            cellData.getBlock().destroy();
-            cellData.setType(CellType.Empty);
+            cellData.destroyBlock()
         }
     }
 
     private collapse(): void
     {
-        this.gridState = GridState.Collapsing;
-
-        // 1. Find Bottom Empty Cells
-        // 2. Take Top
-
-        var columns: number[] = new Array<number>();
-        for (const cellData of this.matches)
-        {
-            if (!columns.includes(cellData.position.y))
+        // Left->Right Bottom->Top
+        for (let i = 0; i < this.width; i++) {
+            for (let j = this.height - 1; j >= 0; j--)
             {
-                columns.push(cellData.position.y)
+                const emptyCell = this.cells[i][j];
+                if (emptyCell.getType() == CellType.Empty)
+                {
+                    // Move Down or Spawn
+                    for (let row = j - 1; row >= 0; row--)
+                    {
+                        const filledCellAbove = this.cells[i][row];
+                        if (filledCellAbove.getType() != CellType.Empty)
+                        {
+                            this.move(filledCellAbove, emptyCell);
+                            break;
+                        }
+                    }
+
+                    if (emptyCell.getType() == CellType.Empty)
+                    {
+                        this.spawn(emptyCell);
+                    }
+                }
+            }
+        }
+    }
+
+    private move(from: CellData, to: CellData)
+    {
+        let block = from.takeBlock()
+        block.state.value = BlockState.Moving
+        to.setData(block)
+    }
+
+    private spawn(to: CellData)
+    {
+        let block = this.getBlockFromPool();
+        block.state.value = BlockState.Spawning;
+        block.type = cc.math.randomRangeInt(1, 5);
+        block.position = null;
+        block.state.value = BlockState.Spawning;
+        to.setData(block);
+    }
+
+    private getBlockFromPool() : Block {
+        for (let i = 0; i < this.poolSize; i++) {
+            if (!this.blocks[i].inUse) {
+                let block: Block = this.blocks[i];
+                block.inUse = true;
+                return block;
+            }
+        }
+
+        console.log("No free blocks in BlockModelPool")
+        return new Block(1);
+    }
+
+    private savePositions()
+    {
+        for (let i = 0; i < this.gridSize.x; i++)
+        {
+            for (let j = 0; j < this.gridSize.y; j++)
+            {
+                this.cells[i][j].getBlock().position = new Vec2(i, j);
             }
         }
     }

@@ -1,13 +1,29 @@
-export class ReactiveProperty extends cc.EventTarget
+export class ReactiveProperty<T>
 {
-    private _value: number = 0;
+    private _value: T;
+    private _bus = new cc.EventTarget();
 
-    set value(val: number) {
-        this._value = val;
-        this.emit('changed', val);
+    constructor(initialValue: T) {
+        this._value = initialValue;
     }
 
-    get value(): number {
+    get value(): T {
         return this._value;
+    }
+
+    set value(val: T) {
+        this._value = val;
+        this._bus.emit('changed', val);
+    }
+
+    public subscribe(onChange: (val: T) => void, thisArg?: any) {
+        // 1) fire once right now…
+        onChange.call(thisArg, this._value);
+        // 2) then listen for future updates
+        this._bus.on('changed', onChange, thisArg);
+    }
+
+    public unsubscribe(onChange: (val: T) => void, thisArg?: any) {
+        this._bus.off('changed', onChange, thisArg);
     }
 }

@@ -15,12 +15,9 @@ export default class BlockPresenter extends cc.Component {
 
     public inUse: boolean = false;
 
-    start () {
-    }
-
     public setData(model: Block) {
         this.icon.spriteFrame = this.spriteFrames[model.type]
-        model.state.on('changed', (val) => this.onBlockStateChanged(val));
+        model.state.subscribe((val) => this.onBlockStateChanged(val));
     }
 
     private onBlockStateChanged(state: BlockState)
@@ -33,7 +30,7 @@ export default class BlockPresenter extends cc.Component {
             case BlockState.Destroying:
                 this.playDestroyAnim()
                 break;
-            case BlockState.Collapsing:
+            case BlockState.Moving:
                 this.playCollapseAnim()
                 break;
         }

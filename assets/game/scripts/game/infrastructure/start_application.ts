@@ -12,10 +12,10 @@ const {ccclass, property} = cc._decorator;
 export default class StartApplication extends cc.Component
 {
     @property(cc.Prefab)
-    splashScreen: cc.Prefab;
+    splashScreen: cc.Prefab = null;
 
     @property(cc.Prefab)
-    mainScene: cc.Prefab;
+    mainScene: cc.Prefab = null;
 
     private readonly gridSize: Vec2 = new Vec2(9,9);
 
@@ -23,8 +23,6 @@ export default class StartApplication extends cc.Component
     {
         this.bindBlockFactory();
         this.bindGrid();
-
-
 
         Postponer.sequence()
             .do(() => this.loadSlashScreen())

@@ -7,11 +7,11 @@ export class BlockFactory {
     private readonly prefabPath: string = "prefabs/blocks/blue_block";
     private prefab: Prefab;
     private readonly PoolSize: number;
-    private readonly blocksPool: Array<BlockPresenter>;
+    private readonly pool: Array<BlockPresenter>;
 
     public constructor(gridSize: Vec2) {
         this.PoolSize = 2 * gridSize.x * gridSize.y;
-        this.blocksPool = Array<BlockPresenter>(this.PoolSize);
+        this.pool = Array<BlockPresenter>(this.PoolSize);
     }
 
 
@@ -24,23 +24,21 @@ export class BlockFactory {
                 this.prefab = prefab;
                 for (let i = 0; i < this.PoolSize; i++)
                 {
-                    this.blocksPool[i] = cc.instantiate(this.prefab).getComponent(BlockPresenter);
+                    this.pool[i] = cc.instantiate(this.prefab).getComponent(BlockPresenter);
                 }
             }
         });
     }
 
-    public create(block: Block, parent: cc.Node, at: Vec2): cc.Node
-    {
-        for (let j = 0; j < this.PoolSize; j++)
-        {
-            if (!this.blocksPool[j].inUse)
-            {
-                this.blocksPool[j].inUse = true;
-                this.blocksPool[j].setData(block);
-                this.blocksPool[j].node.parent = parent;
-                this.blocksPool[j].node.setPosition(at);
-                return this.blocksPool[j].node;
+    public create(block: Block, parent: cc.Node, at: Vec2): cc.Node {
+        for (let j = 0; j < this.PoolSize; j++) {
+            let instance: BlockPresenter = this.pool[j];
+            if (!instance.inUse) {
+                instance.inUse = true;
+                instance.setData(block);
+                instance.node.parent = parent;
+                instance.node.setPosition(at);
+                return this.pool[j].node;
             }
         }
     }
