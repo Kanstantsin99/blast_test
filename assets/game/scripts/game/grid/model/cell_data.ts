@@ -1,4 +1,4 @@
-import {Block} from "./block";
+import {Block, BlockState} from "./block";
 import Vec2 = cc.Vec2;
 
 export enum CellType {
@@ -28,12 +28,12 @@ export class CellData {
         this.type = CellType.Empty;
         let block = this.block
         this.block = null;
-        return block; // Check if not nullable block is returned
+        return block;
     }
 
     public destroyBlock()
     {
-        this.block.destroy();
+        this.block.state.value = BlockState.Destroying;
         this.type = CellType.Empty;
     }
 

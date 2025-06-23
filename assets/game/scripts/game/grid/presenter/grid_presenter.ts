@@ -1,9 +1,11 @@
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {CellData, Grid, GridState} from "../model/grid";
+import {Grid, GridState} from "../model/grid";
 import {BlockFactory} from "../model/block_factory";
 import Vec2 = cc.Vec2;
 import {Block, BlockState} from "../model/block";
+import {CellData} from "../model/cell_data";
 import Prefab = cc.Prefab;
+import BlockPresenter from "./block_presenter";
 
 
 const {ccclass, property} = cc._decorator;
@@ -18,7 +20,7 @@ export default class GridPresenter extends cc.Component {
     private gridSize: Vec2;
     private blockFactory: BlockFactory;
     private cellSize: Vec2;
-    private cellSpeed: number = 9; // cells pre sec
+    private cellSpeed: number = 10; // cells pre sec
     private blockPresenters : Map<Block, cc.Node>;
 
     protected onLoad()
@@ -105,7 +107,6 @@ export default class GridPresenter extends cc.Component {
         const delayTime = (gridHeight - 1 - to.y) / cellSpeed;
         const endPos = this.grid_to_pixel(to.x, to.y);
 
-        block.state.value = BlockState.Moving;
         let blockPrefab = this.blockPresenters.get(block);
 
             cc.tween(blockPrefab)
@@ -133,7 +134,12 @@ export default class GridPresenter extends cc.Component {
 
     private destroyMatches()
     {
-        // this.grid.matches
+        for (let cell of this.grid.matches)
+        {
+            let block = cell.getBlock();
+            this.blockPresenters.get(block).getComponent(BlockPresenter).inUse = false;
+            block.inUse = false;
+        }
     }
 
     private onGridStateChanged(state: GridState)
@@ -146,7 +152,7 @@ export default class GridPresenter extends cc.Component {
             case GridState.Idle:
                 break;
             case GridState.DestroyingMatches:
-                // this.destroyMatches();
+                this.destroyMatches();
                 break;
             case GridState.Collapsing:
                 this.collapse();

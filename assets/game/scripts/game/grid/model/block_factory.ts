@@ -5,9 +5,9 @@ import Vec2 = cc.Vec2;
 
 export class BlockFactory {
     private readonly prefabPath: string = "prefabs/blocks/blue_block";
-    private prefab: Prefab;
     private readonly PoolSize: number;
     private readonly pool: Array<BlockPresenter>;
+    private prefab: Prefab;
 
     public constructor(gridSize: Vec2) {
         this.PoolSize = 2 * gridSize.x * gridSize.y;

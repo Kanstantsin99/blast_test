@@ -151,8 +151,12 @@ export class Grid implements IService
         const matches = this.getAdjacentMatches(cellPos);
         if (matches.length > 2)
         {
-            this.matches = matches;
             this.switchState()
+            this.matches = matches;
+        }
+        else
+        {
+            this.cells[cellPos.x][cellPos.y].getBlock().state.value = BlockState.Clicked;
         }
     }
 
@@ -160,7 +164,7 @@ export class Grid implements IService
     {
         for (const cellData of this.matches)
         {
-            cellData.destroyBlock()
+            cellData.destroyBlock();
         }
     }
 
@@ -206,7 +210,6 @@ export class Grid implements IService
         block.state.value = BlockState.Spawning;
         block.type = cc.math.randomRangeInt(1, 5);
         block.position = null;
-        block.state.value = BlockState.Spawning;
         to.setData(block);
     }
 
@@ -219,7 +222,7 @@ export class Grid implements IService
             }
         }
 
-        console.log("No free blocks in BlockModelPool")
+        console.error("No free blocks in BlockModelPool")
         return new Block(1);
     }
 

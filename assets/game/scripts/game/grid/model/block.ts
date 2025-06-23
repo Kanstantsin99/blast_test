@@ -15,7 +15,8 @@ export enum BlockState {
     Idle = 1,
     Destroying = 2,
     Moving = 3,
-    Spawning = 4
+    Spawning = 4,
+    Clicked = 5
 }
 
 export class Block {
@@ -33,5 +34,6 @@ export class Block {
     destroy()
     {
         this.state.value = BlockState.Destroying;
+        this.inUse = false;
     }
 }
