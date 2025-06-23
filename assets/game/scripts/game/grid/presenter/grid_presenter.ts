@@ -20,7 +20,7 @@ export default class GridPresenter extends cc.Component {
     private gridSize: Vec2;
     private blockFactory: BlockFactory;
     private cellSize: Vec2;
-    private cellSpeed: number = 10; // cells pre sec
+    private cellSpeed: number = 15; // cells pre sec
     private blockPresenters : Map<Block, cc.Node>;
 
     protected onLoad()
@@ -95,6 +95,8 @@ export default class GridPresenter extends cc.Component {
             this.gridNode,
             startPos
         );
+        node.width = this.cellSize.x;
+        node.height = this.cellSize.y;
         this.blockPresenters.set(block, node);
     }
 
