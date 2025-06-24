@@ -608,8 +608,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 44.49,
-      "height": 50.4
+      "width": 111.23,
+      "height": 126
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -621,7 +621,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        0,
+        7.105427357601002e-15,
         0,
         0,
         0,
@@ -662,8 +662,8 @@
     "_dstBlendFactor": 771,
     "_string": "37",
     "_N$string": "37",
-    "_fontSize": 40,
-    "_lineHeight": 40,
+    "_fontSize": 100,
+    "_lineHeight": 100,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
@@ -901,8 +901,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 102.91,
-      "height": 50.4
+      "width": 205.82,
+      "height": 100.8
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -955,8 +955,8 @@
     "_dstBlendFactor": 771,
     "_string": "Очки:",
     "_N$string": "Очки:",
-    "_fontSize": 40,
-    "_lineHeight": 40,
+    "_fontSize": 80,
+    "_lineHeight": 80,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
@@ -1009,8 +1009,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 144.59,
-      "height": 50.4
+      "width": 289.18,
+      "height": 100.8
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1063,8 +1063,8 @@
     "_dstBlendFactor": 771,
     "_string": "221/500",
     "_N$string": "221/500",
-    "_fontSize": 40,
-    "_lineHeight": 40,
+    "_fontSize": 80,
+    "_lineHeight": 80,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
@@ -1779,7 +1779,7 @@
     "_enabled": true,
     "alignMode": 1,
     "_target": null,
-    "_alignFlags": 45,
+    "_alignFlags": 5,
     "_left": 0,
     "_right": 0,
     "_top": 321,
@@ -2422,6 +2422,9 @@
     "_enabled": true,
     "restartPopUpPrefab": {
       "__uuid__": "30c5f129-be29-4913-b6e3-af66bc9ef90e"
+    },
+    "backgroundSprite": {
+      "__id__": 3
     },
     "_id": ""
   },

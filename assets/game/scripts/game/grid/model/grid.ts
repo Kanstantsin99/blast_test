@@ -13,7 +13,8 @@ export enum GridState
     DestroyingMatches = 2,
     Collapsing = 3,
     Win = 4,
-    Loose = 5
+    Loose = 5,
+    Preparing = 6
 }
 
 export class Grid implements IService
@@ -40,6 +41,16 @@ export class Grid implements IService
         this.switchState()
     }
 
+    public getGridSize(): Vec2
+    {
+        return this.gridSize;
+    }
+
+    public getCells(): CellData[][]
+    {
+        return this.cells;
+    }
+
     private initCellsArray(): CellData[][] {
         const array: CellData[][] = new Array<CellData[]>(this.width);
 
@@ -52,7 +63,8 @@ export class Grid implements IService
         return array;
     }
 
-    private initBlocksArray(): Block[] {
+    private initBlocksArray(): Block[]
+    {
         const array: Block[] = new Array<Block>(this.poolSize);
 
         for (let i = 0; i < this.poolSize; i++) {
@@ -61,15 +73,8 @@ export class Grid implements IService
         return array;
     }
 
-    public getGridSize(): Vec2 {
-        return this.gridSize;
-    }
-
-    public getCells(): CellData[][] {
-        return this.cells;
-    }
-
-    private getAdjacentMatches(startPos: Vec2): CellData[] {
+    private getAdjacentMatches(startPos: Vec2): CellData[]
+    {
         const startCell = this.cells[startPos.x][startPos.y];
         const targetType = startCell.getBlock().type;
         const visited = new Set<string>();
@@ -117,6 +122,10 @@ export class Grid implements IService
         {
             case GridState.None:
                 break;
+            case GridState.Preparing:
+                Postponer.sequence()
+                    .do(() => this.prepare())
+                break;
             case GridState.Idle:
                 Postponer.sequence()
                     .do(() => this.destroyMatches())
@@ -143,7 +152,27 @@ export class Grid implements IService
         }
     }
 
-    public match_at(cellPos: Vec2): void
+    private prepare(): void
+    {
+        // If there is no available matches -> shuffle and start collapsing
+        for (let i = 1; i < this.width; i++)
+        {
+            for (let j = 0; j < this.height; j++)
+            {
+                const matches = this.getAdjacentMatches(this.cells[i][j].position)
+                if (matches > 2)
+                {
+                    this.switchState();
+                    return
+                }
+            }
+        }
+
+        this.shuffle();
+        this.gridState.value = GridState.Collapsing;
+    }
+
+    public matchAt(cellPos: Vec2): void
     {
         if (this.gridState.value != GridState.Idle)
         {
@@ -153,7 +182,7 @@ export class Grid implements IService
         const matches = this.getAdjacentMatches(cellPos);
         if (matches.length > 2)
         {
-            this.switchState()
+            this.switchState();
             this.matches = matches;
         }
         else
@@ -243,5 +272,15 @@ export class Grid implements IService
     public restart(): void
     {
         cc.game.end();
+    }
+    
+    private shuffle(): void
+    {
+        this.matches = []
+        for (let i = 0; i < this.gridSize.x; i++)
+        {
+            this.matches = this.matches.concat(this.cells[i]);
+        }
+        this.switchState()
     }
 }

@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "RestartPopUp",
+    "_name": "PopUp",
     "_objFlags": 0,
     "_parent": null,
     "_children": [

@@ -1,6 +1,9 @@
-import {ServiceLocator} from "../../utils/service_locator/service_locator";
-import {Grid, GridState} from "../../game/grid/model/grid";
-import RestartPopup from "./restart_popup";
+
+
+import {ServiceLocator} from "../../../utils/service_locator/service_locator";
+import {Grid, GridState} from "../../grid/model/grid";
+import PopUp from "./popup";
+
 
 const {ccclass, property} = cc._decorator;
 
@@ -8,17 +11,19 @@ const {ccclass, property} = cc._decorator;
 export default class UIPresenter extends cc.Component
 {
     private grid: Grid;
-    private restartPopUp: RestartPopup;
+    private popUp: PopUp;
 
     @property(cc.Prefab)
     restartPopUpPrefab: cc.Prefab = null;
 
+    @property(cc.Sprite)
+    backgroundSprite: cc.Sprite = null;
     start ()
     {
         this.grid = ServiceLocator.get(Grid);
         let restartPopUpNode = cc.instantiate(this.restartPopUpPrefab);
-        this.restartPopUp = restartPopUpNode.getComponent(RestartPopup);
-        this.restartPopUp.hide();
+        this.popUp = restartPopUpNode.getComponent(PopUp);
+        this.popUp.hide();
         restartPopUpNode.parent = this.node;
 
         this.grid.gridState.subscribe((gridState) => this.onGridStateChanged(gridState));
@@ -47,22 +52,22 @@ export default class UIPresenter extends cc.Component
 
     private showWinPopUp()
     {
-        this.restartPopUp.setData("You Win!!!");
-        this.restartPopUp.button.node.on('click', (button: cc.Button) => {this.restart()})
-        this.restartPopUp.show();
+        this.popUp.setData("You Win!!!");
+        this.popUp.button.node.on('click', (button: cc.Button) => {this.restart()})
+        this.popUp.show();
     }
 
     private showLoosePopUp()
     {
-        this.restartPopUp.setData("You Loose :(");
-        this.restartPopUp.button.node.on('click', (button: cc.Button) => {this.restart()})
-        this.restartPopUp.show();
+        this.popUp.setData("You Loose :(");
+        this.popUp.button.node.on('click', (button: cc.Button) => {this.restart()})
+        this.popUp.show();
     }
 
     private restart()
     {
-        this.restartPopUp.button.node.off('click');
-        this.restartPopUp.hide();
+        this.popUp.button.node.off('click');
+        this.popUp.hide();
         this.grid.restart();
     }
 }

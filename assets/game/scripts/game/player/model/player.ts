@@ -1,7 +1,7 @@
-import {ReactiveProperty} from "../../utils/types/reactive_property";
-import {IService} from "../../utils/service_locator/i_service";
-import {ServiceLocator} from "../../utils/service_locator/service_locator";
-import {Grid, GridState} from "../../game/grid/model/grid";
+import {ReactiveProperty} from "../../../utils/types/reactive_property";
+import {Grid, GridState} from "../../grid/model/grid";
+import {IService} from "../../../utils/service_locator/i_service";
+import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 
 
 export class Player implements IService

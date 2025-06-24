@@ -4,7 +4,6 @@ import {BlockFactory} from "../model/block_factory";
 import Vec2 = cc.Vec2;
 import {Block, BlockState} from "../model/block";
 import {CellData} from "../model/cell_data";
-import Prefab = cc.Prefab;
 import BlockPresenter from "./block_presenter";
 
 
@@ -20,7 +19,7 @@ export default class GridPresenter extends cc.Component {
     private gridSize: Vec2;
     private blockFactory: BlockFactory;
     private cellSize: Vec2;
-    private cellSpeed: number = 15; // cells pre sec
+    private cellSpeed: number = 1500;
     private blockPresenters : Map<Block, cc.Node>;
 
     protected onLoad()
@@ -28,7 +27,7 @@ export default class GridPresenter extends cc.Component {
         this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {
             const localPos = this.gridNode.convertToNodeSpaceAR(event.getLocation());
             const cellPos = this.pixel_to_grid(localPos);
-            this.grid.match_at(cellPos);
+            this.grid.matchAt(cellPos);
         }, this);
     }
 
@@ -50,16 +49,6 @@ export default class GridPresenter extends cc.Component {
         this.cellSize.x = Math.floor(this.gridNode.width / gridSize.x);
         this.cellSize.y = Math.floor(this.gridNode.height / gridSize.y);
     }
-
-    // private spawnBlocks()
-    // {
-    //     for (let i = 0; i < this.gridSize.x; i++) {
-    //         for (let j = this.gridSize.y - 1; j >= 0; j--)
-    //         {
-    //             this.spawnBlock(i, j);
-    //         }
-    //     }
-    // }
 
     private collapse()
     {
@@ -102,22 +91,26 @@ export default class GridPresenter extends cc.Component {
 
     private move(block: Block, to: Vec2): void
     {
-        const gridHeight = this.gridSize.y;
-        const cellSpeed = this.cellSpeed;
-        const totalCells = gridHeight + 1;
-        const duration = totalCells / cellSpeed;
-        const delayTime = (gridHeight - 1 - to.y) / cellSpeed;
+        const height = this.gridSize.y + 1
+        let blockPresenter = this.blockPresenters.get(block);
+
+        if (!block.position)
+        {
+            block.position = new Vec2(to.x, - (height - to.y));
+        }
+        const startPos = this.grid_to_pixel(block.position.x, block.position.y);
         const endPos = this.grid_to_pixel(to.x, to.y);
 
-        let blockPrefab = this.blockPresenters.get(block);
+        const distance: number = endPos.sub(startPos).mag();
+        const duration = distance / this.cellSpeed;
 
-            cc.tween(blockPrefab)
-                .delay(delayTime)
-                .to(
-                    duration,
-                    {position: endPos}
-                )
-                .start();
+        blockPresenter.setPosition(startPos.x, startPos.y);
+        cc.tween(blockPresenter)
+            .to(
+                duration,
+                {position: endPos}
+            )
+            .start();
     }
 
     private grid_to_pixel(column: number, row: number): Vec2

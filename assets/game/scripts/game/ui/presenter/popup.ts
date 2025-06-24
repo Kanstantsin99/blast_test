@@ -1,11 +1,7 @@
-import {Grid} from "../../game/grid/model/grid";
-
-
-
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class RestartPopup extends cc.Component
+export default class PopUp extends cc.Component
 {
     @property(cc.Label)
     label: cc.Label = null;

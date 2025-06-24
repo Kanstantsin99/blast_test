@@ -1,5 +1,6 @@
-import {ServiceLocator} from "../../utils/service_locator/service_locator";
-import {Player} from "../model/player";
+
+import {Player} from "../../player/model/player";
+import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 
 const {ccclass, property} = cc._decorator;
 

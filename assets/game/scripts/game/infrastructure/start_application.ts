@@ -1,9 +1,10 @@
 import {Grid} from "../grid/model/grid";
-import Vec2 = cc.Vec2;
 import {ServiceLocator} from "../../utils/service_locator/service_locator";
 import {BlockFactory} from "../grid/model/block_factory";
-import { Postponer } from "../../utils/postponer/postpener";
-import {Player} from "../../player/model/player";
+import {Postponer} from "../../utils/postponer/postpener";
+import {Player} from "../player/model/player";
+import {Durations} from "../../durations";
+import Vec2 = cc.Vec2;
 
 
 const {ccclass, property} = cc._decorator;
@@ -33,7 +34,7 @@ export default class StartApplication extends cc.Component
     private launchGameLoop() {
         Postponer.sequence()
             .do(() => this.loadSlashScreen())
-            .wait(() => new Promise(resolve => setTimeout(resolve, 1000)))
+            .wait(() => new Promise(resolve => setTimeout(resolve, Durations.LoadingScreen * 1000)))
             .do(() => this.loadMain())
     }
 
