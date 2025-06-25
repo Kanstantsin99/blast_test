@@ -1,5 +1,5 @@
 import {ReactiveProperty} from "../../../utils/types/reactive_property";
-import {Grid, GridState} from "../../grid/model/grid";
+import {Grid, GridStates} from "../../grid/model/grid";
 import {IService} from "../../../utils/service_locator/i_service";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 
@@ -21,18 +21,18 @@ export class Player implements IService
         this.grid.gridState.subscribe(gridState => {this.onGridStateChanged(gridState);});
     }
 
-    private onGridStateChanged(gridState: GridState): void
+    private onGridStateChanged(gridState: GridStates): void
     {
         switch(gridState)
         {
-            case GridState.None:
+            case GridStates.None:
                 break;
-            case GridState.Idle:
+            case GridStates.Idle:
                 break;
-            case GridState.DestroyingMatches:
+            case GridStates.DestroyingMatches:
                 this.countScore();
                 break;
-            case GridState.Collapsing:
+            case GridStates.Collapsing:
                 this.checkWinLoose();
                 break;
         }
@@ -54,13 +54,13 @@ export class Player implements IService
     {
         if (this.score.value >= this.goal.value)
         {
-            this.grid.gridState.value = GridState.Win;
+            this.grid.gridState.value = GridStates.Win;
             return;
         }
 
         if (this.movesLeft.value < 1)
         {
-            this.grid.gridState.value = GridState.Loose;
+            this.grid.gridState.value = GridStates.Loose;
             return;
         }
     }
