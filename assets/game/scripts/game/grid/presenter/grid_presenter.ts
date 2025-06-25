@@ -1,10 +1,10 @@
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {Grid, GridState} from "../model/grid";
+import {Grid, GridStates} from "../model/grid";
 import {BlockFactory} from "../model/block_factory";
-import Vec2 = cc.Vec2;
-import {Block, BlockState} from "../model/block";
+import {Block} from "../model/block";
 import {CellData} from "../model/cell_data";
 import BlockPresenter from "./block_presenter";
+import Vec2 = cc.Vec2;
 
 
 const {ccclass, property} = cc._decorator;
@@ -24,11 +24,7 @@ export default class GridPresenter extends cc.Component {
 
     protected onLoad()
     {
-        this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {
-            const localPos = this.gridNode.convertToNodeSpaceAR(event.getLocation());
-            const cellPos = this.pixel_to_grid(localPos);
-            this.grid.matchAt(cellPos);
-        }, this);
+        this.onMouseClick();
     }
 
     protected start()
@@ -41,6 +37,24 @@ export default class GridPresenter extends cc.Component {
         this.setCellSize();
 
         this.grid.gridState.subscribe((val) => this.onGridStateChanged(val))
+    }
+
+    private onGridStateChanged(state: GridStates)
+    {
+        console.log("onGridStateChange: ", state);
+        switch (state)
+        {
+            case GridStates.None:
+                break;
+            case GridStates.Idle:
+                break;
+            case GridStates.DestroyingMatches:
+                this.destroyMatches();
+                break;
+            case GridStates.Collapsing:
+                this.collapse();
+                break;
+        }
     }
 
     private setCellSize()
@@ -137,21 +151,11 @@ export default class GridPresenter extends cc.Component {
         }
     }
 
-    private onGridStateChanged(state: GridState)
-    {
-        console.log("onGridStateChange: ", state);
-        switch (state)
-        {
-            case GridState.None:
-                break;
-            case GridState.Idle:
-                break;
-            case GridState.DestroyingMatches:
-                this.destroyMatches();
-                break;
-            case GridState.Collapsing:
-                this.collapse();
-                break;
-        }
+    private onMouseClick() {
+        this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {
+            const localPos = this.gridNode.convertToNodeSpaceAR(event.getLocation());
+            const cellPos = this.pixel_to_grid(localPos);
+            this.grid.matchAt(cellPos);
+        }, this);
     }
 }

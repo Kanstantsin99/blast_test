@@ -1,7 +1,7 @@
 
 
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {Grid, GridState} from "../../grid/model/grid";
+import {Grid, GridStates} from "../../grid/model/grid";
 import PopUp from "./popup";
 
 
@@ -29,22 +29,22 @@ export default class UIPresenter extends cc.Component
         this.grid.gridState.subscribe((gridState) => this.onGridStateChanged(gridState));
     }
 
-    private onGridStateChanged(state: GridState): void
+    private onGridStateChanged(state: GridStates): void
     {
         switch(state)
         {
-            case GridState.None:
+            case GridStates.None:
                 break;
-            case GridState.Idle:
+            case GridStates.Idle:
                 break;
-            case GridState.DestroyingMatches:
+            case GridStates.DestroyingMatches:
                 break;
-            case GridState.Collapsing:
+            case GridStates.Collapsing:
                 break;
-            case GridState.Win:
+            case GridStates.Win:
                 this.showWinPopUp();
                 break;
-            case GridState.Loose:
+            case GridStates.Loose:
                 this.showLoosePopUp();
                 break;
         }
