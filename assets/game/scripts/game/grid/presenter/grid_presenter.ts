@@ -1,9 +1,8 @@
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {Grid, GridStates} from "../model/grid";
 import {BlockFactory} from "../model/block_factory";
 import {Block} from "../model/block";
 import {CellData} from "../model/cell_data";
-import BlockPresenter from "./block_presenter";
+import {IGrid} from "../model/grid";
 import Vec2 = cc.Vec2;
 
 
@@ -15,7 +14,7 @@ export default class GridPresenter extends cc.Component {
     @property(cc.Node)
     gridNode: cc.Node = null;
 
-    private grid: Grid;
+    private grid: IGrid;
     private gridSize: Vec2;
     private blockFactory: BlockFactory;
     private cellSize: Vec2;
@@ -30,32 +29,32 @@ export default class GridPresenter extends cc.Component {
     protected start()
     {
         this.blockPresenters = new Map<Block, cc.Node>();
-        this.grid = ServiceLocator.get(Grid);
+        this.grid = ServiceLocator.get(IGrid);
         this.gridSize = this.grid.getGridSize();
         this.blockFactory = ServiceLocator.get(BlockFactory);
         this.cellSize = new Vec2(0, 0);
         this.setCellSize();
 
-        this.grid.gridState.subscribe((val) => this.onGridStateChanged(val))
+        // this.grid.gridState.subscribe((val) => this.onGridStateChanged(val))
     }
 
-    private onGridStateChanged(state: GridStates)
-    {
-        console.log("onGridStateChange: ", state);
-        switch (state)
-        {
-            case GridStates.None:
-                break;
-            case GridStates.Idle:
-                break;
-            case GridStates.DestroyingMatches:
-                this.destroyMatches();
-                break;
-            case GridStates.Collapsing:
-                this.collapse();
-                break;
-        }
-    }
+    // private onGridStateChanged(state: GridStates)
+    // {
+    //     console.log("onGridStateChange: ", state);
+    //     switch (state)
+    //     {
+    //         case GridStates.None:
+    //             break;
+    //         case GridStates.Idle:
+    //             break;
+    //         case GridStates.DestroyingMatches:
+    //             this.destroyMatches();
+    //             break;
+    //         case GridStates.Collapsing:
+    //             this.collapse();
+    //             break;
+    //     }
+    // }
 
     private setCellSize()
     {
@@ -141,15 +140,15 @@ export default class GridPresenter extends cc.Component {
         return new Vec2(column, row);
     }
 
-    private destroyMatches()
-    {
-        for (let cell of this.grid.matches)
-        {
-            let block = cell.getBlock();
-            this.blockPresenters.get(block).getComponent(BlockPresenter).inUse = false;
-            block.inUse = false;
-        }
-    }
+    // private destroyMatches()
+    // {
+    //     for (let cell of this.grid.matches)
+    //     {
+    //         let block = cell.getBlock();
+    //         this.blockPresenters.get(block).getComponent(BlockPresenter).inUse = false;
+    //         block.inUse = false;
+    //     }
+    // }
 
     private onMouseClick() {
         this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {

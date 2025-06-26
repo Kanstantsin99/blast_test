@@ -21,7 +21,7 @@ export namespace Postponer {
 
     function delayOneFrame(): Promise<void> {
         return new Promise(resolve => {
-            setTimeout(resolve, 0); // Mimics UniTask.Yield() + NextFrame
+            setTimeout(resolve, 0);
         });
     }
 
@@ -37,3 +37,9 @@ export namespace Postponer {
         return sequence;
     }
 }
+
+//Example
+// Postponer.sequence()
+//     .do(() => this.loadSplashScreen())
+//     .wait(() => new Promise(resolve => setTimeout(resolve, Durations.LoadingScreen * 1000)))
+//     .do(() => this.loadMain())

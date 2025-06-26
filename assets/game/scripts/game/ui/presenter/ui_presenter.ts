@@ -1,8 +1,8 @@
 
 
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {Grid, GridStates} from "../../grid/model/grid";
 import PopUp from "./popup";
+import {IGrid} from "../../grid/model/grid";
 
 
 const {ccclass, property} = cc._decorator;
@@ -10,7 +10,7 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class UIPresenter extends cc.Component
 {
-    private grid: Grid;
+    private grid: IGrid;
     private popUp: PopUp;
 
     @property(cc.Prefab)
@@ -20,35 +20,35 @@ export default class UIPresenter extends cc.Component
     backgroundSprite: cc.Sprite = null;
     start ()
     {
-        this.grid = ServiceLocator.get(Grid);
+        this.grid = ServiceLocator.get(IGrid);
         let restartPopUpNode = cc.instantiate(this.restartPopUpPrefab);
         this.popUp = restartPopUpNode.getComponent(PopUp);
         this.popUp.hide();
         restartPopUpNode.parent = this.node;
 
-        this.grid.gridState.subscribe((gridState) => this.onGridStateChanged(gridState));
+        // this.grid.gridState.subscribe((gridState) => this.onGridStateChanged(gridState));
     }
 
-    private onGridStateChanged(state: GridStates): void
-    {
-        switch(state)
-        {
-            case GridStates.None:
-                break;
-            case GridStates.Idle:
-                break;
-            case GridStates.DestroyingMatches:
-                break;
-            case GridStates.Collapsing:
-                break;
-            case GridStates.Win:
-                this.showWinPopUp();
-                break;
-            case GridStates.Loose:
-                this.showLoosePopUp();
-                break;
-        }
-    }
+    // private onGridStateChanged(state: GridStates): void
+    // {
+    //     switch(state)
+    //     {
+    //         case GridStates.None:
+    //             break;
+    //         case GridStates.Idle:
+    //             break;
+    //         case GridStates.DestroyingMatches:
+    //             break;
+    //         case GridStates.Collapsing:
+    //             break;
+    //         case GridStates.Win:
+    //             this.showWinPopUp();
+    //             break;
+    //         case GridStates.Loose:
+    //             this.showLoosePopUp();
+    //             break;
+    //     }
+    // }
 
     private showWinPopUp()
     {
@@ -68,6 +68,6 @@ export default class UIPresenter extends cc.Component
     {
         this.popUp.button.node.off('click');
         this.popUp.hide();
-        this.grid.restart();
+        // this.grid.restart();
     }
 }

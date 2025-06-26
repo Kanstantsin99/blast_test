@@ -1,92 +1,95 @@
-import {Grid} from "../grid/model/grid";
+import {GameStateMachine, IGameStateMachine} from "./game_state_machine";
+import {GameState} from "./game_states/game_state";
+import {Player} from "../player/model/player";
 import {ServiceLocator} from "../../utils/service_locator/service_locator";
 import {BlockFactory} from "../grid/model/block_factory";
+import {SceneLoader} from "./scenes/scene_loader";
+import {GreetingState} from "./game_states/greetings_state";
+import {CollapsingState} from "./game_states/collapsing_state";
+import {CheckingState} from "./game_states/checking_state";
+import {IdleState} from "./game_states/idle_state";
+import {DestroyingState} from "./game_states/destroying_state";
+import {WinningState} from "./game_states/winning_state";
+import {LoosingState} from "./game_states/loosing_state";
+import {Grid, IGrid} from "../grid/model/grid";
 import {Postponer} from "../../utils/postponer/postpener";
-import {Player} from "../player/model/player";
-import {Durations} from "../../durations";
-import {StateMachine} from "../../utils/state_machine/state_machine";
-import {GridState} from "../grid/model/states/grid_state";
-import {IdleState} from "../grid/model/states/idle_state";
-import {CollapsingState} from "../grid/model/states/collapsing_state";
-import {GreetingState} from "../grid/model/states/greetings_state";
-import {CheckingState} from "../grid/model/states/checking_state";
-import {DestroyingState} from "../grid/model/states/destroying_state";
-import {WinningState} from "../grid/model/states/winning_state";
-import {LoosingState} from "../grid/model/states/loosing_state";
 import Vec2 = cc.Vec2;
+import {BootingState} from "./game_states/booting_state";
 
 
-const {ccclass, property} = cc._decorator;
-
+const {ccclass} = cc._decorator;
 
 @ccclass
 export default class StartApplication extends cc.Component
 {
-    @property(cc.Prefab)
-    splashScreen: cc.Prefab = null;
-
-    @property(cc.Prefab)
-    mainScene: cc.Prefab = null;
-
-    private readonly gridSize: Vec2 = new Vec2(3,3);
+    private readonly _gridSize: Vec2 = new Vec2(3,3);
+    private _gameStateMachine: IGameStateMachine;
 
     protected onLoad()
     {
+        cc.game.addPersistRootNode(this.node);
+
+        this.launchServices();
+        this.launchGame();
+    }
+
+    private launchServices()
+    {
+        this.bindSceneLoader();
         this.bindBlockFactory();
         this.bindGrid();
         this.bindPlayer();
-
-        this.launchGameGame();
+        this.bindGameStateMachine();
     }
 
-    private bindPlayer() {
+    private launchGame()
+    {
+        Postponer.sequence()
+            .wait(() => new Promise(resolve => setTimeout(resolve, 1000)))
+            .do(() => this._gameStateMachine.enter<BootingState>("BootingState"));
+    }
+
+    private bindPlayer()
+    {
         const player = new Player(10, 0, 5000);
         ServiceLocator.register(Player, player);
     }
 
-    private bindBlockFactory() {
-        const blockFactory = new BlockFactory(this.gridSize);
+    private bindBlockFactory()
+    {
+        const blockFactory = new BlockFactory(this._gridSize);
         blockFactory.load()
         ServiceLocator.register(BlockFactory, blockFactory)
     }
 
-    private loadMain() {
-        const mainScene = cc.instantiate(this.mainScene);
-        this.node.addChild(mainScene);
-        console.log("Main scene loaded");
-    }
-
-    private loadSplashScreen() {
-        const splashScreenNode = cc.instantiate(this.splashScreen);
-        this.node.addChild(splashScreenNode);
-        console.log("Splash screen loaded");
-    }
-
-    private bindGrid() {
-        // Init grid state machine
-        const states: GridState[] =
-            [new GreetingState, new CollapsingState, new CheckingState,
-            new IdleState, new DestroyingState, new WinningState, new LoosingState];
-        const gridStateMachine = new StateMachine<GridState>(states);
-        // init grid
-        const gridService = new Grid(this.gridSize, gridStateMachine);
-        ServiceLocator.register(Grid, gridService);
-    }
-
-    private launchGameGame() {
-        Postponer.sequence()
-            .do(() => this.loadSplashScreen())
-            .wait(() => new Promise(resolve => setTimeout(resolve, Durations.LoadingScreen * 1000)))
-            .do(() => this.loadMain())
-    }
-
-    private onStartGame()
+    private bindGameStateMachine()
     {
-        // switch to greeting state
+        this._gameStateMachine = new GameStateMachine<GameState>();
+        ServiceLocator.register(IGameStateMachine, this._gameStateMachine);
+        this.initGameStateMachine();
     }
 
-    private onWelcomePopUpClicked()
+    private bindSceneLoader()
     {
-        // switch to collapsing
+        const sceneLoader = new SceneLoader();
+        ServiceLocator.register(SceneLoader, sceneLoader);
+    }
+
+    private bindGrid()
+    {
+        const gridService: IGrid = new Grid(this._gridSize);
+        ServiceLocator.register(IGrid, gridService);
+    }
+
+    private initGameStateMachine()
+    {
+        const states: GameState[] =
+            [new BootingState, new GreetingState, new CollapsingState, new CheckingState,
+                new IdleState, new DestroyingState, new WinningState, new LoosingState];
+        states.forEach(state =>
+            {
+                this._gameStateMachine.registerState(state);
+            }
+        );
     }
 }

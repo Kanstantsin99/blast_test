@@ -1,13 +1,18 @@
-export interface IStateMachine<T> {
+import {IService} from "../service_locator/i_service";
+
+export interface IStateMachine<T> extends IService
+{
     registerState(key: string, state: T): void;
     enter(key: string): void;
 }
 
-export interface IEnterState {
+export interface IEnterState
+{
     enter(): void;
 }
 
-export interface IExitState {
+export interface IExitState
+{
     exit(): void;
 }
 
@@ -17,17 +22,19 @@ export class StateMachine<T> implements IStateMachine<T>
     private readonly _states: Map<string, T>;
     private _state: T;
 
-    constructor(states: Array<T>)
+    constructor(states: T[] = [])
     {
         this._states = new Map<string, T>();
         states.forEach(state => this.registerState(state));
     }
 
-    public registerState(state: T): void {
+    public registerState(state: T): void
+    {
         this._states.set(state.constructor.name, state);
     }
 
-    public enter<TState extends T>(state: string): void {
+    public enter<TState extends T>(state: string): void
+    {
         this.switch<TState>(state)
 
         if (this._state.enter !== undefined)
