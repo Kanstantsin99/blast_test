@@ -2,6 +2,7 @@ import {IService} from "../../../utils/service_locator/i_service";
 import LoadingScreen, {ILoadingScreen} from "../../ui/presenter/loading_screen";
 import PopUp, {IPopUp} from "../../ui/presenter/popup";
 
+export const ISceneLoader = Symbol("ISceneLoader");
 interface ISceneLoader extends IService
 {
     popUp: IPopUp;

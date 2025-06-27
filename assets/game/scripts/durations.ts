@@ -2,7 +2,7 @@
 
 export class Durations {
     static LoadingScreen: number = 1;
-    static Logo: number = 3;
-    static Destroying: number = 0.5;
-    static Collapsing: number = 0.5;
+    static Destroying: number = 1;
+    static Collapsing: number = 1;
+    static PopUp: number = 0.5;
 }

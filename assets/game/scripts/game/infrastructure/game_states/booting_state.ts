@@ -3,19 +3,19 @@ import {IEnterState, IExitState} from "../../../utils/state_machine/state_machin
 import {Postponer} from "../../../utils/postponer/postpener";
 import {IGameStateMachine} from "../game_state_machine";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {SceneLoader} from "../scenes/scene_loader";
+import {ISceneLoader, SceneLoader} from "../scenes/scene_loader";
 import {GreetingState} from "./greetings_state";
 
 
 export class BootingState implements GameState, IEnterState, IExitState
 {
     private readonly _gameStateMachine: IGameStateMachine;
-    private readonly _loader: SceneLoader;
+    private readonly _loader: ISceneLoader;
 
     constructor()
     {
         this._gameStateMachine = ServiceLocator.get(IGameStateMachine);
-        this._loader = ServiceLocator.get(SceneLoader);
+        this._loader = ServiceLocator.get(ISceneLoader);
     }
     enter(): void
     {

@@ -1,5 +1,5 @@
 
-import {Player} from "../../player/model/player";
+import {IPlayer} from "../../player/model/player";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 
 const {ccclass, property} = cc._decorator;
@@ -18,7 +18,7 @@ export default class TopRowPresenter extends cc.Component {
     scoreLabel: cc.Label = null;
     start ()
     {
-        let player = ServiceLocator.get(Player);
+        let player: IPlayer = ServiceLocator.get(IPlayer);
 
         player.movesLeft.subscribe(movesLeft => {this.onMovesLeftChanged(movesLeft);});
         player.goal.subscribe(goal => {this.onGoalChanged(goal);});

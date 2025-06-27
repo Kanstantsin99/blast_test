@@ -7,42 +7,48 @@ export enum CellType {
     Filled= 2
 }
 
-export class CellData {
-    private type: CellType;
-    private block: Block;
-    constructor(public position: Vec2) {
-        this.type = CellType.Empty;
-    }
+export class CellData
+{
+    private _type: CellType;
+    private _block: Block;
 
-    public setData(block: Block) {
-        this.block = block;
-        this.type = CellType.Filled;
-    }
-
-    public getBlock(): Block {
-        return this.block;
-    }
-
-    public takeBlock(): Block
+    constructor(public position: Vec2)
     {
-        this.type = CellType.Empty;
-        let block = this.block
-        this.block = null;
-        return block;
+        this._type = CellType.Empty;
     }
 
-    public destroyBlock()
+    public setBlock(block: Block)
     {
-        this.block.state.value = BlockState.Destroying;
-        this.type = CellType.Empty;
+        this._block = block;
+        this._type = CellType.Filled;
+    }
+
+    public setType(CellType: CellType)
+    {
+        this._type = CellType;
+    }
+
+    public getBlock(): Block
+    {
+        return this._block;
     }
 
     public getType(): CellType
     {
-        return this.type;
+        return this._type;
     }
 
-    public setType(CellType: CellType) {
-        this.type = CellType;
+    public takeBlock(): Block
+    {
+        this._type = CellType.Empty;
+        let block = this._block
+        this._block = null;
+        return block;
+    }
+
+    public free()
+    {
+        this._block.state.value = BlockState.Destroying;
+        this._type = CellType.Empty;
     }
 }

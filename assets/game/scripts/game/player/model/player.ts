@@ -1,10 +1,21 @@
 import {ReactiveProperty} from "../../../utils/types/reactive_property";
 import {IService} from "../../../utils/service_locator/i_service";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
-import {Grid, IGrid} from "../../grid/model/grid";
+import {GridState, IGrid} from "../../grid/model/grid";
 
+export const IPlayer = Symbol("IPlayer");
+export interface IPlayer extends IService
+{
+    movesLeft: ReactiveProperty<number>;
+    score: ReactiveProperty<number>;
+    goal: ReactiveProperty<number>;
 
-export class Player implements IService
+    checkWin(): boolean;
+    checkLoose(): boolean;
+    reset(): void;
+}
+
+export class Player implements IPlayer
 {
     private grid: IGrid;
 
@@ -18,50 +29,43 @@ export class Player implements IService
         this.goal = new ReactiveProperty(goal);
         this.grid = ServiceLocator.get(IGrid);
 
-        // this.grid.gridState.subscribe(gridState => {this.onGridStateChanged(gridState);});
+        this.grid.state.subscribe(gridState => {this.onGridStateChanged(gridState);});
     }
 
-    // private onGridStateChanged(gridState: GridStates): void
-    // {
-    //     switch(gridState)
-    //     {
-    //         case GridStates.None:
-    //             break;
-    //         case GridStates.Idle:
-    //             break;
-    //         case GridStates.DestroyingMatches:
-    //             this.countScore();
-    //             break;
-    //         case GridStates.Collapsing:
-    //             this.checkWinLoose();
-    //             break;
-    //     }
-    // }
+    private onGridStateChanged(gridState: GridState): void
+    {
+        switch(gridState)
+        {
+            case GridState.None:
+                break;
+            case GridState.Matching:
+                this.countScore();
+                break;
+        }
+    }
 
-    // private countScore()
-    // {
-    //     if(!this.grid.matches)
-    //     {
-    //         return;
-    //     }
-    //     this.movesLeft.value = cc.math.clamp(this.movesLeft.value - 1, 0, this.movesLeft.value);
-    //     let matchedBlocks = this.grid.matches.length;
-    //     let blockValue = 100;
-    //     this.score.value = cc.math.clamp(this.score.value + matchedBlocks * blockValue, 0, this.goal.value);
-    // }
+    private countScore()
+    {
+        this.movesLeft.value = cc.math.clamp(this.movesLeft.value - 1, 0, this.movesLeft.value);
+        let matchedBlocks = this.grid.getMatches().length;
+        let blockValue = 100;
+        this.score.value = cc.math.clamp(this.score.value + matchedBlocks * blockValue, 0, this.goal.value);
+    }
 
-    // private checkWinLoose()
-    // {
-    //     if (this.score.value >= this.goal.value)
-    //     {
-    //         this.grid.gridState.value = GridStates.Win;
-    //         return;
-    //     }
-    //
-    //     if (this.movesLeft.value < 1)
-    //     {
-    //         this.grid.gridState.value = GridStates.Loose;
-    //         return;
-    //     }
-    // }
+    public checkWin()
+    {
+        return this.score.value >= this.goal.value;
+    }
+
+    public checkLoose(): boolean
+    {
+        return this.movesLeft.value < 1;
+    }
+
+    public reset(): void
+    {
+        this.movesLeft.value = 10;
+        this.goal.value = 5000;
+        this.score.value = 0;
+    }
 }

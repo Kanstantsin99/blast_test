@@ -23,6 +23,7 @@ export default class BlockPresenter extends cc.Component {
 
     private onBlockStateChanged(state: BlockState)
     {
+        console.log("Block state", state);
         switch(state) {
             case BlockState.None:
                 break;

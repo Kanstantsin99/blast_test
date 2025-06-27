@@ -1,6 +1,7 @@
 
 import {CancellationToken} from "../model/cancelation_token";
 import {TweenAnimation} from "../model/tween_animations";
+import {Durations} from "../../../durations";
 
 const {ccclass, property} = cc._decorator
 
@@ -39,13 +40,15 @@ export default class PopUp extends cc.Component implements IPopUp
     {
         this.setData(text);
         this._isCancelled = new CancellationToken();
-        TweenAnimation.fadeTo(this.visuals, 1, this._isCancelled)
+        TweenAnimation.fadeTo(this.visuals, 1, Durations.PopUp, this._isCancelled)
+        TweenAnimation.scaleTo(this.visuals, 1, Durations.PopUp, this._isCancelled)
         await this.buttonClick();
     }
 
     public async hide(): Promise<void>
     {
-        await TweenAnimation.fadeTo(this.visuals, 0, this._isCancelled);
+        TweenAnimation.fadeTo(this.visuals, 0, Durations.PopUp, this._isCancelled);
+        await TweenAnimation.scaleTo(this.visuals, 0, Durations.PopUp, this._isCancelled);
     }
 
     private setData(string: string)

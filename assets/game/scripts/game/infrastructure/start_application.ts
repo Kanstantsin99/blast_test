@@ -1,9 +1,9 @@
 import {GameStateMachine, IGameStateMachine} from "./game_state_machine";
 import {GameState} from "./game_states/game_state";
-import {Player} from "../player/model/player";
+import {IPlayer, Player} from "../player/model/player";
 import {ServiceLocator} from "../../utils/service_locator/service_locator";
 import {BlockFactory} from "../grid/model/block_factory";
-import {SceneLoader} from "./scenes/scene_loader";
+import {SceneLoader, ISceneLoader} from "./scenes/scene_loader";
 import {GreetingState} from "./game_states/greetings_state";
 import {CollapsingState} from "./game_states/collapsing_state";
 import {CheckingState} from "./game_states/checking_state";
@@ -13,8 +13,10 @@ import {WinningState} from "./game_states/winning_state";
 import {LoosingState} from "./game_states/loosing_state";
 import {Grid, IGrid} from "../grid/model/grid";
 import {Postponer} from "../../utils/postponer/postpener";
-import Vec2 = cc.Vec2;
 import {BootingState} from "./game_states/booting_state";
+import {Durations} from "../../durations";
+import {MatchingState} from "./game_states/matching_state";
+import Vec2 = cc.Vec2;
 
 
 const {ccclass} = cc._decorator;
@@ -22,13 +24,11 @@ const {ccclass} = cc._decorator;
 @ccclass
 export default class StartApplication extends cc.Component
 {
-    private readonly _gridSize: Vec2 = new Vec2(3,3);
+    private readonly _gridSize: Vec2 = new Vec2(5,5);
     private _gameStateMachine: IGameStateMachine;
 
     protected onLoad()
     {
-        cc.game.addPersistRootNode(this.node);
-
         this.launchServices();
         this.launchGame();
     }
@@ -45,14 +45,14 @@ export default class StartApplication extends cc.Component
     private launchGame()
     {
         Postponer.sequence()
-            .wait(() => new Promise(resolve => setTimeout(resolve, 1000)))
+            .wait(() => new Promise(resolve => setTimeout(resolve, Durations.LoadingScreen * 1000)))
             .do(() => this._gameStateMachine.enter<BootingState>("BootingState"));
     }
 
     private bindPlayer()
     {
-        const player = new Player(10, 0, 5000);
-        ServiceLocator.register(Player, player);
+        const player: IPlayer = new Player(10, 0, 5000);
+        ServiceLocator.register(IPlayer, player);
     }
 
     private bindBlockFactory()
@@ -64,15 +64,15 @@ export default class StartApplication extends cc.Component
 
     private bindGameStateMachine()
     {
-        this._gameStateMachine = new GameStateMachine<GameState>();
+        this._gameStateMachine = new GameStateMachine();
         ServiceLocator.register(IGameStateMachine, this._gameStateMachine);
         this.initGameStateMachine();
     }
 
     private bindSceneLoader()
     {
-        const sceneLoader = new SceneLoader();
-        ServiceLocator.register(SceneLoader, sceneLoader);
+        const sceneLoader: ISceneLoader = new SceneLoader();
+        ServiceLocator.register(ISceneLoader, sceneLoader);
     }
 
     private bindGrid()
@@ -85,7 +85,7 @@ export default class StartApplication extends cc.Component
     {
         const states: GameState[] =
             [new BootingState, new GreetingState, new CollapsingState, new CheckingState,
-                new IdleState, new DestroyingState, new WinningState, new LoosingState];
+                new IdleState, new MatchingState, new DestroyingState, new WinningState, new LoosingState];
         states.forEach(state =>
             {
                 this._gameStateMachine.registerState(state);

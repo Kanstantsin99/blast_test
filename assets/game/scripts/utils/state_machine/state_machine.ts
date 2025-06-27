@@ -2,7 +2,7 @@ import {IService} from "../service_locator/i_service";
 
 export interface IStateMachine<T> extends IService
 {
-    registerState(key: string, state: T): void;
+    registerState(state: T): void;
     enter(key: string): void;
 }
 
@@ -20,7 +20,7 @@ export interface IExitState
 export class StateMachine<T> implements IStateMachine<T>
 {
     private readonly _states: Map<string, T>;
-    private _state: T;
+    protected _state: T;
 
     constructor(states: T[] = [])
     {
