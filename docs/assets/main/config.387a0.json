@@ -1,0 +1,56 @@
+{
+    "paths": {},
+    "uuids": [
+        "29FYIk+N1GYaeWH/q1NxQO",
+        "2dL3kvpAxJu6GJ7RdqJG5J",
+        "31vIlawANFZqnzLlSuHBfc",
+        "41D7kWhyFGY7q4NDlzkazn",
+        "4cwFBBhaBMJ79j6QBfZ9r9",
+        "baTc1qLl1Bcr/JYeQVl4pM",
+        "e97GVMl6JHh5Ml5qEDdSGa",
+        "ecpdLyjvZBwrvm+cedCcQy",
+        "f0BIwQ8D5Ml7nTNQbh1YlS",
+        "f9grEXfKFHW6SETfdv6N+9"
+    ],
+    "scenes": {
+        "db://assets/game/scenes/boot.fire": "2dL3kvpAxJu6GJ7RdqJG5J"
+    },
+    "redirect": [
+        "29FYIk+N1GYaeWH/q1NxQO",
+        0,
+        "31vIlawANFZqnzLlSuHBfc",
+        0,
+        "41D7kWhyFGY7q4NDlzkazn",
+        0,
+        "4cwFBBhaBMJ79j6QBfZ9r9",
+        0,
+        "baTc1qLl1Bcr/JYeQVl4pM",
+        0,
+        "e97GVMl6JHh5Ml5qEDdSGa",
+        0,
+        "ecpdLyjvZBwrvm+cedCcQy",
+        1,
+        "f0BIwQ8D5Ml7nTNQbh1YlS",
+        0,
+        "f9grEXfKFHW6SETfdv6N+9",
+        0
+    ],
+    "deps": [
+        "resources",
+        "internal"
+    ],
+    "packs": {},
+    "name": "main",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false,
+    "versions": {
+        "import": [
+            "2dL3kvpAxJu6GJ7RdqJG5J",
+            "1f52a"
+        ],
+        "native": []
+    }
+}
