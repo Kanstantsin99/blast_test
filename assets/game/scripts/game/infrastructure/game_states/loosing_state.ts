@@ -1,5 +1,5 @@
 import {GameState} from "./game_state";
-import {IEnterState, IExitState} from "../../../utils/state_machine/state_machine";
+import {IEnterState} from "../../../utils/state_machine/state_machine";
 import {IGrid} from "../../grid/model/grid";
 import {IGameStateMachine} from "../game_state_machine";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
@@ -23,14 +23,16 @@ export class LoosingState implements GameState, IEnterState
         this._player = ServiceLocator.get(IPlayer);
     }
 
-
     enter(): void
     {
-        console.log("You entered in LoosingState");
+        let level = this._player.getLevel().toString();
         Postponer.sequence()
             .wait(() =>
             {
-                return this._loader.popUp.show("Неудача :(", "Да, " + this._player.getLevel().toString() + " уровень достаточно сложный. Но не время сдаваться!");
+                return this._loader.popUp.show("Неудача :(", "Возможно, " +
+                    level +
+                    " уровень сложный, а может тебе просто не повезло?" +
+                    "\nПопробуй еще разок!");
             })
             .wait(() =>
             {

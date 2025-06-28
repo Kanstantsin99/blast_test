@@ -1,4 +1,4 @@
-import {IService} from "../../../utils/service_locator/i_service";
+import {IService} from "../../../utils/service_locator/service";
 import Vec2 = cc.Vec2;
 import {CellData, CellType} from "./cell_data";
 import {Block, BlockState} from "./block";
@@ -26,6 +26,7 @@ export interface IGrid extends IService
     destroyMatches(): void;
     savePositions(): void;
     getMatches(): CellData[];
+    matchAt(cellPos: Vec2): void;
 }
 
 export class Grid implements IGrid

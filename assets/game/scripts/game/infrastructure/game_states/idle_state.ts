@@ -18,7 +18,6 @@ export class IdleState implements GameState, IEnterState
     }
 
     enter(): void {
-        console.log("You entered in IdleState");
         Postponer.sequence()
             .do(() => this._grid.state.value = GridState.WaitingInput)
             .wait(() => new Promise(resolve => this._grid.state.subscribe(() => {if (this._grid.state.value === GridState.Matching) resolve();})))

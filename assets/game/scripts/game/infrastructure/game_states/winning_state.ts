@@ -5,9 +5,8 @@ import {ISceneLoader, SceneLoader} from "../scenes/scene_loader";
 import {IGameStateMachine} from "../game_state_machine";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 import {Postponer} from "../../../utils/postponer/postpener";
-import {DestroyingState} from "./destroying_state";
-import {IPlayer, Player} from "../../player/model/player";
-import loader = cc.loader;
+import {IPlayer} from "../../player/model/player";
+
 
 export class WinningState implements GameState, IEnterState
 {
@@ -26,11 +25,13 @@ export class WinningState implements GameState, IEnterState
 
     enter(): void
     {
-        console.log("You entered in Winning State");
+        let goal = this._player.getGoal().toString();
+        let nextLevel = (this._player.getLevel() + 1).toString()
         Postponer.sequence()
             .wait(() =>
             {
-                return this._loader.popUp.show("Победа!!!", "Молодец, так держать!!!\nПопробуй " + this._player.getLevel().toString() + " уровень.");
+                return this._loader.popUp.show("Победа!!!", "Молодец, ты заработал...\n" + goal + " очков!!!" +
+                    "\nПопробуй " + nextLevel + " уровень.");
             })
             .wait(() =>
             {
@@ -38,6 +39,7 @@ export class WinningState implements GameState, IEnterState
             })
             .do(() => this._grid.destroy())
             .wait(() => this._loader.loadingScreen.appear())
+            .do(() => this._player.levelUp())
             .do(() => this._player.reset())
             .do(() => this._gameStateMachine.destroyCount = 3)
             .wait(() => this._loader.loadingScreen.fade())

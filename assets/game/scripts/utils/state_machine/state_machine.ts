@@ -1,4 +1,4 @@
-import {IService} from "../service_locator/i_service";
+import {IService} from "../service_locator/service";
 
 export interface IStateMachine<T> extends IService
 {
@@ -40,6 +40,7 @@ export class StateMachine<T> implements IStateMachine<T>
         if (this._state.enter !== undefined)
         {
             this._state.enter();
+            console.log("State Machine: You entered in ", state);
         }
     }
 
@@ -54,6 +55,7 @@ export class StateMachine<T> implements IStateMachine<T>
         if (this._state && this._state.exit !== undefined)
         {
             this._state.exit();
+            console.log("State Machine: You exited from", state);
         }
 
         this._state = next;

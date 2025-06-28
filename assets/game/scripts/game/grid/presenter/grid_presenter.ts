@@ -24,7 +24,7 @@ export default class GridPresenter extends cc.Component {
 
     protected onLoad()
     {
-        this.onMouseClick();
+        this.onClick();
     }
 
     protected start()
@@ -153,13 +153,17 @@ export default class GridPresenter extends cc.Component {
         }
     }
 
-    private onMouseClick()
+    private onClick()
     {
-        this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, function (event: cc.Event.EventMouse) {
-            const localPos = this.gridNode.convertToNodeSpaceAR(event.getLocation());
+        const handler = (event: cc.Event.EventMouse | cc.Event.EventTouch) => {
+            const location = (event as any).getLocation();
+            const localPos = this.gridNode.convertToNodeSpaceAR(location);
             const cellPos = this.pixel_to_grid(localPos);
             this._grid.matchAt(cellPos);
-        }, this);
+        };
+
+        this.gridNode.on(cc.Node.EventType.MOUSE_DOWN, handler, this);
+        this.gridNode.on(cc.Node.EventType.TOUCH_START, handler, this);
     }
 
     private onGridDestroy()

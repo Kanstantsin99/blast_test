@@ -1,4 +1,4 @@
-import {IService} from "./i_service";
+import {IService} from "./service";
 
 
 export class ServiceLocator {

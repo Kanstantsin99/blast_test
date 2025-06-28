@@ -1,9 +1,9 @@
-import tween = cc.tween;
-import Color = cc.Color;
+import {TweenAnimation} from "../model/tween_animations";
 import {Durations} from "../../../durations";
-import fadeTo = cc.fadeTo;
+import {CancellationToken} from "../model/cancelation_token";
 
 const {ccclass, property} = cc._decorator;
+
 
 export interface ILoadingScreen
 {
@@ -14,7 +14,7 @@ export interface ILoadingScreen
 @ccclass
 export default class LoadingScreen extends cc.Component implements ILoadingScreen
 {
-    private _isCancelled = false;
+    private _cancellationToken: CancellationToken;
 
     @property(cc.Node)
     Logo: cc.Node = null;
@@ -24,57 +24,25 @@ export default class LoadingScreen extends cc.Component implements ILoadingScree
 
     protected onDestroy()
     {
-        this._isCancelled = true;
+        this._cancellationToken.cancel();
     }
 
     protected start()
     {
+        this._cancellationToken = new CancellationToken();
         this.ForegroundImage.opacity = 0;
     }
 
     public async appear(): Promise<void>
     {
-        this._isCancelled = false;
-        this.LogoPulsationAnim();
-        await this.fadeTo(1);
+        this._cancellationToken = new CancellationToken();
+        TweenAnimation.pulsation(this.Logo, 2, this._cancellationToken);
+        await TweenAnimation.fadeTo(this.node, 1, Durations.LoadingScreen, this._cancellationToken);
     }
 
     public async fade(): Promise<void>
     {
-        this._isCancelled = false;
-        await this.fadeTo(0);
-    }
-
-    private fadeTo(opacity: number): Promise<void>
-    {
-        return new Promise(resolve => {
-            if (this._isCancelled)
-            {
-                resolve();
-                return;
-            }
-
-            cc.tween(this.ForegroundImage)
-                .to(2, {opacity: opacity * 255})
-                .call(() =>
-                {
-                    if (this._isCancelled) return;
-                    resolve();
-                })
-                .start()
-        });
-    }
-
-    private LogoPulsationAnim()
-    {
-        this.Logo.scale = 1;
-        console.log("Logo pulsation started")
-
-        tween(this.Logo)
-            .to(2, {scale: 1.2}, {easing: 'sineIn'})
-            .to(2, {scale: 1,}, {easing: 'sineOut'})
-            .union()
-            .repeatForever()
-            .start();
+        await TweenAnimation.fadeTo(this.node, 0, Durations.LoadingScreen, this._cancellationToken);
+        this._cancellationToken.cancel();
     }
 }

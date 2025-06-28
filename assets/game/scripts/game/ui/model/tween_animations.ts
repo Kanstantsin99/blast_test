@@ -47,4 +47,25 @@ export class TweenAnimation
                 .start();
         });
     }
+
+    static pulsation(node: cc.Node, frequency: number, cancellation: CancellationToken): Promise<void>
+    {
+        return new Promise(resolve =>
+        {
+            if (cancellation.isCancelled)
+            {
+                cc.tween(node).stop();
+                resolve();
+                return;
+            }
+
+            cc.tween(node)
+                .set({scale: 1})
+                .to(frequency/4, {scale: 1.2}, {easing: 'sineIn'})
+                .to(frequency/4, {scale: 1,}, {easing: 'sineOut'})
+                .union()
+                .repeatForever()
+                .start();
+        });
+    }
 }

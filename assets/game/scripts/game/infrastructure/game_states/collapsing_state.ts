@@ -7,6 +7,7 @@ import {IGameStateMachine} from "../game_state_machine";
 import {CheckingState} from "./checking_state";
 import {Durations} from "../../../durations";
 
+
 export class CollapsingState implements GameState, IEnterState
 {
     private _grid: IGrid;
@@ -20,7 +21,6 @@ export class CollapsingState implements GameState, IEnterState
 
     enter(): void
     {
-        console.log("You entered CollapsingState");
         Postponer.sequence()
             .do(() => this._grid.collapse())
             .wait(() => new Promise(resolve => setTimeout(resolve, Durations.Collapsing * 1000)))

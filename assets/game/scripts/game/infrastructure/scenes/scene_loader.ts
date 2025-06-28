@@ -1,4 +1,4 @@
-import {IService} from "../../../utils/service_locator/i_service";
+import {IService} from "../../../utils/service_locator/service";
 import LoadingScreen, {ILoadingScreen} from "../../ui/presenter/loading_screen";
 import PopUp, {IPopUp} from "../../ui/presenter/popup";
 

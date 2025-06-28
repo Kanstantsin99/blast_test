@@ -8,6 +8,7 @@ import {DestroyingState} from "./destroying_state";
 import {IdleState} from "./idle_state";
 import {IPlayer} from "../../player/model/player";
 
+
 export class CheckingState implements GameState, IEnterState
 {
     private _grid: IGrid;
@@ -24,7 +25,6 @@ export class CheckingState implements GameState, IEnterState
     }
 
     enter(): void {
-        console.log("You entered in Checking State");
         Postponer.sequence()
             .do(() => {this._needToShuffle = this._grid.prepare()})
             .do(() => {this._grid.savePositions()})

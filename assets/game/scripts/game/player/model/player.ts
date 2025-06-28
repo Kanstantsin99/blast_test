@@ -1,5 +1,5 @@
 import {ReactiveProperty} from "../../../utils/types/reactive_property";
-import {IService} from "../../../utils/service_locator/i_service";
+import {IService} from "../../../utils/service_locator/service";
 import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 import {GridState, IGrid} from "../../grid/model/grid";
 
@@ -11,6 +11,8 @@ export interface IPlayer extends IService
     goal: ReactiveProperty<number>;
 
     getLevel(): number;
+    getGoal(): number;
+    levelUp(): void;
     checkWin(): boolean;
     checkLoose(): boolean;
     reset(): void;
@@ -60,6 +62,11 @@ export class Player implements IPlayer
         return this._level;
     }
 
+    public getGoal(): number
+    {
+        return this._initGoal;
+    }
+
     private countScore()
     {
         this.movesLeft.value = cc.math.clamp(this.movesLeft.value - 1, 0, this.movesLeft.value);
@@ -70,12 +77,7 @@ export class Player implements IPlayer
 
     public checkWin()
     {
-        if (this.score.value >= this.goal.value)
-        {
-            this.levelUp();
-            return true;
-        }
-        return false;
+        return this.score.value >= this.goal.value;
     }
 
     public checkLoose(): boolean
@@ -90,7 +92,7 @@ export class Player implements IPlayer
         this.score.value = this._initScore;
     }
 
-    private levelUp()
+    public levelUp()
     {
         this._level++;
         this._initMovesLeft += 2;

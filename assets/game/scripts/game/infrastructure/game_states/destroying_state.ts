@@ -9,6 +9,7 @@ import {LoosingState} from "./loosing_state";
 import {CollapsingState} from "./collapsing_state";
 import {Durations} from "../../../durations";
 
+
 export class DestroyingState implements GameState, IEnterState
 {
     private _grid: IGrid;
@@ -23,11 +24,11 @@ export class DestroyingState implements GameState, IEnterState
 
     enter(): void
     {
-        console.log("You entered in Destroying State");
+        let prevStateName = this._gameStateMachine.getPreviousState().constructor.name;
         Postponer.sequence()
             .do(() =>
             {
-                if (this._gameStateMachine.getPreviousState().constructor.name === "CheckingState")
+                if (prevStateName === "CheckingState")
                 {
                     this._gameStateMachine.destroyCount--;
                     if (this._gameStateMachine.destroyCount <= 0)
@@ -45,9 +46,6 @@ export class DestroyingState implements GameState, IEnterState
                 }
             })
             .wait(() => new Promise(resolve => {setTimeout(resolve, Durations.Destroying * 1000)}))
-            .do(() =>
-            {
-                this._gameStateMachine.enter(this._nextState)
-            })
+            .do(() => {this._gameStateMachine.enter(this._nextState)})
     }
 }

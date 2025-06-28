@@ -46,7 +46,7 @@ export default class StartApplication extends cc.Component
     {
         Postponer.sequence()
             .wait(() => new Promise(resolve => setTimeout(resolve, Durations.LoadingScreen * 1000)))
-            .do(() => this._gameStateMachine.enter<BootingState>("BootingState"));
+            .do(() => this._gameStateMachine.enter("BootingState"));
     }
 
     private bindPlayer()
