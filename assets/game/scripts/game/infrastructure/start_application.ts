@@ -51,7 +51,7 @@ export default class StartApplication extends cc.Component
 
     private bindPlayer()
     {
-        const player: IPlayer = new Player(10, 0, 5000);
+        const player: IPlayer = new Player(4, 0, 1000);
         ServiceLocator.register(IPlayer, player);
     }
 

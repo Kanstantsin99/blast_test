@@ -8,7 +8,7 @@ const {ccclass, property} = cc._decorator
 
 export interface IPopUp
 {
-    show(text: string): Promise<void>;
+    show(headerText: string, text: string): Promise<void>;
     hide(): Promise<void>;
 }
 
@@ -18,7 +18,10 @@ export default class PopUp extends cc.Component implements IPopUp
     private _isCancelled: CancellationToken = new CancellationToken();
 
     @property(cc.Label)
-    label: cc.Label = null;
+    headerLabel: cc.Label = null;
+
+    @property(cc.Label)
+    textLabel: cc.Label = null;
 
     @property(cc.Button)
     button: cc.Button = null;
@@ -36,9 +39,9 @@ export default class PopUp extends cc.Component implements IPopUp
         this.visuals.opacity = 0;
     }
 
-    public async show(text: string): Promise<void>
+    public async show(headerText: string, text: string): Promise<void>
     {
-        this.setData(text);
+        this.setData(headerText, text);
         this._isCancelled = new CancellationToken();
         TweenAnimation.fadeTo(this.visuals, 1, Durations.PopUp, this._isCancelled)
         TweenAnimation.scaleTo(this.visuals, 1, Durations.PopUp, this._isCancelled)
@@ -51,9 +54,10 @@ export default class PopUp extends cc.Component implements IPopUp
         await TweenAnimation.scaleTo(this.visuals, 0, Durations.PopUp, this._isCancelled);
     }
 
-    private setData(string: string)
+    private setData(headerText: string, text: string): void
     {
-        this.label.string = string;
+        this.headerLabel.string = headerText;
+        this.textLabel.string = text;
     }
 
     private buttonClick(): Promise<void>

@@ -30,7 +30,7 @@ export class LoosingState implements GameState, IEnterState
         Postponer.sequence()
             .wait(() =>
             {
-                return this._loader.popUp.show("Видимо, тебе не повезло :(\nПопробуй еще раз!");
+                return this._loader.popUp.show("Неудача :(", "Да, " + this._player.getLevel().toString() + " уровень достаточно сложный. Но не время сдаваться!");
             })
             .wait(() =>
             {

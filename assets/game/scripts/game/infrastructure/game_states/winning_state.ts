@@ -7,6 +7,7 @@ import {ServiceLocator} from "../../../utils/service_locator/service_locator";
 import {Postponer} from "../../../utils/postponer/postpener";
 import {DestroyingState} from "./destroying_state";
 import {IPlayer, Player} from "../../player/model/player";
+import loader = cc.loader;
 
 export class WinningState implements GameState, IEnterState
 {
@@ -29,14 +30,17 @@ export class WinningState implements GameState, IEnterState
         Postponer.sequence()
             .wait(() =>
             {
-                return this._loader.popUp.show("Молодец!!!\nТы справился!!\nТеперь можешь начать по новой...");
+                return this._loader.popUp.show("Победа!!!", "Молодец, так держать!!!\nПопробуй " + this._player.getLevel().toString() + " уровень.");
             })
             .wait(() =>
             {
                 return this._loader.popUp.hide();
             })
-            .do(() => this._gameStateMachine.destroyCount = 3)
+            .do(() => this._grid.destroy())
+            .wait(() => this._loader.loadingScreen.appear())
             .do(() => this._player.reset())
-            .do(() => this._gameStateMachine.enter<DestroyingState>("DestroyingState"));
+            .do(() => this._gameStateMachine.destroyCount = 3)
+            .wait(() => this._loader.loadingScreen.fade())
+            .do(() => this._gameStateMachine.enter("CollapsingState"))
     }
 }

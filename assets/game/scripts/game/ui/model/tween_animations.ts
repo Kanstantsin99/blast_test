@@ -38,7 +38,7 @@ export class TweenAnimation
 
             cc.tween(node)
                 .set({scale: initScale})
-                .to(duration, {scale: scale})
+                .to(duration, {scale: scale}, {easing: 'cubicIn'})
                 .call(() =>
                 {
                     if (cancellation.isCancelled) return;

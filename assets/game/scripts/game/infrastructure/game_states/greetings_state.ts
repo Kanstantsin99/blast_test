@@ -21,7 +21,7 @@ export class GreetingState implements GameState, IEnterState, IExitState
     {
         console.log("You entered in GreetingState");
         Postponer.sequence()
-            .wait(() => {return this._loader.popUp.show("Привет!\nУ меня для тебя есть просьба. Потыкай в места, где больше всего блоков одного цвета.")})
+            .wait(() => {return this._loader.popUp.show("Привет!", "У меня для тебя есть просьба. Потыкай в места, где больше всего блоков одного цвета.")})
             .wait(() => {return this._loader.popUp.hide()})
             .do(() => {this._gameStateMachine.enter<CollapsingState>("CollapsingState")})
     }
